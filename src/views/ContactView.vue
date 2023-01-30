@@ -5,65 +5,76 @@
             <table>
                 <tbody>
                     <tr>
-                        <th>お名前</th>
+                        <th>氏名</th>
                         <td>
-                            <input v-model="name" placeholder="例）田中 太郎">
+                            <input v-model="name" placeholder="田中 太郎">
                             <p class="error">{{ errors.name }}</p>
                         </td>
                     </tr>
                     <tr>
                         <th>フリガナ</th>
                         <td>
-                            <input v-model="kana" placeholder="例）タナカ タロウ">
+                            <input v-model="kana" placeholder="タナカ タロウ">
                             <p class="error">{{ errors.kana }}</p>
                         </td>
                     </tr>
                     <tr>
                         <th>性別</th>
                         <td>
-                            <input v-model="gender">
+                          <p calss="select">
+                            <select v-model="selection.gender">
+                            <option>男性</option>
+                            <option>女性</option>
+                            <option>無回答</option>
+                          </select>
                             <p class="error">{{ errors.gender }}</p>
                         </td>
                     </tr>
                     <tr>
                         <th>生年月日</th>
                         <td>
-                            <input v-model="birth" placeholder="例）19990101">
+                            <input v-model="birth" placeholder="19990101">
                             <p class="error">{{ errors.birth }}</p>
                         </td>
                     </tr>
                     <tr>
                         <th>郵便番号</th>
                         <td>
-                            <input v-model="post" placeholder="例）0101234">
+                            <input v-model="post" placeholder="0101234">
                             <p class="error">{{ errors.post }}</p>
                         </td>
                     </tr>
                     <tr>
                         <th>住所</th>
                         <td>
-                            <input v-model="adress" placeholder="例）〇〇県〇〇市△△町1-1-1 〇〇コーポ101">
+                            <input v-model="adress" placeholder="〇〇県〇〇市△△町1-1-1 〇〇コーポ101">
                             <p class="error">{{ errors.adress }}</p>
                         </td>
                     </tr>
                     <tr>
                         <th>電話番号</th>
                         <td>
-                            <input v-model="tell" placeholder="例）0120000000">
-                            <p class="error">{{ errors.tell }}</p>
+                            <input v-model="tell" placeholder="0120000000">
                         </td>
                     </tr>
                     <tr>
                         <th>メールアドレス</th>
                         <td>
-                            <input v-model="email" placeholder="例）info@example.co.jp">
+                            <input v-model="email" placeholder="info@example.co.jp">
                             <p class="error">{{ errors.email }}</p>
                         </td>
                     </tr>
                     <tr>
                         <th>問い合わせの種類</th>
                         <td>
-                            <input v-model="kind">
+                          <p calss="select">
+                            <select v-model="selection.kind">
+                            <option>ご質問</option>
+                            <option>ご意見ご要望</option>
+                            <option>資料請求</option>
+                            <option>ご依頼</option>
+                            <option>その他</option>
+                          </select>
                             <p class="error">{{ errors.kind }}</p>
                         </td>
                     </tr>
@@ -84,6 +95,176 @@
         </transition>
     </div>
 </template>
+
+<script>
+import axios from 'axios'
+
+export default {
+    data: function() {
+        return {
+            name: '',
+            kana: '',
+            birth: '',
+            post: '',
+            adress: '',
+            tell: '',
+            email: '',
+            message: '',
+            result: '',
+            selection: {
+                gender: [],
+                kind: []
+            }
+        }
+    },
+    computed: {
+        checkName: function(){
+            if(!this.name){
+                return 'お名前を入力してください';
+            }
+            return '';
+        },
+        checkKana: function(){
+            if(!this.kana){
+                return 'フリガナを入力してください';
+            } else if(!this.validKatakana(this.kana)){
+                return 'フリガナをカタカナで入力してください';
+            }
+            return '';
+        },
+        checkGender: function(){
+            if(!this.gender){
+                return '性別を選択してください';
+            }
+            return '';
+        },
+        checkBirth: function(){
+            if(!this.birth){
+                return '生年月日を選択してください';
+            } else if(!this.validBirth(this.birth)){
+                return '生年月日を選択してください';
+            }
+            return '';
+        },
+        checkPost: function(){
+            if(!this.post){
+                return '郵便番号を入力してください';
+            } else if(!this.validPost(this.post)){
+                return '郵便番号を正しく入力してください';
+            }
+            return '';
+        },
+        checkAdress: function(){
+            if(!this.adress){
+                return '住所を入力してください';
+            }
+            return '';
+        },
+        checkEmail: function(){
+            if(!this.email){
+                return '';
+            } else if(!this.validEmail(this.email)){
+                return 'メールアドレスを正しく入力してください';
+            }
+            return '';
+        },
+        checkKind: function(){
+            if(!this.kind){
+                return '問い合わせ種類を選択してください';
+            } 
+            return '';
+        },
+        checkMessage: function(){
+            if(!this.message){
+                return '相談内容を入力してください';
+            }
+            return '';
+        },
+        errors: function() {
+            const errors = {
+                'name': this.checkName,
+                'kana': this.checkKana,
+                'gender': this.checkGender,
+                'birth': this.checkBirth,
+                'post': this.checkPost,
+                'adress': this.checkAdress,
+                'email': this.checkEmail,
+                'kind': this.checkKind,
+                'message': this.checkMessage,
+            };
+            for (var key in errors) {
+                if (errors[key] === '' || errors[key] === null || errors[key] === undefined) {
+                    delete errors[key];
+                }
+            }
+            return errors;
+        },
+        valid: function() {
+            return !Object.keys(this.errors).length;
+        }
+    },
+    methods: {
+        submit: async function(){
+            const result = await this.send();
+            this.result = result;
+            if(result === '送信完了'){
+                this.clear();
+            }
+        },
+        send: async function(){
+            const url = 'http://localhost/contact/send.php';
+            const params = {
+                'name': this.name,
+                'kana': this.kana,
+                'gender': this.gender,
+                'birth': this.birth,
+                'post': this.post,
+                'adress': this.adress,
+                'tell': this.tell,
+                'email': this.email,
+                'kind': this.kind,
+                'message': this.message
+            }
+            return await axios
+                .post(url, params)
+                .then(function(res){
+                    return res.data;
+                })
+                .catch(function(error){
+                    console.log(error);
+            });
+        },
+        validKatakana: function(kana) {
+            const re = /^[ァ-ンｧ-ﾝ\x20\u3000ﾞﾟ]*$/;
+            return re.test(kana);
+        },
+        validBirth: function(birth) {
+            const re = /^([0-9]{8})$/;
+            return re.test(birth);
+        },
+        validPost: function(post) {
+            const re = /^([0-9]{7})$/;
+            return re.test(post);
+        },
+        validEmail: function(email) {
+            const re = /^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
+            return re.test(email);
+        },
+        clear: function(){
+            this.name = '';
+            this.kana = '';
+            this.gender = '';
+            this.birth = '';
+            this.post = '';
+            this.adress = '';
+            this.tell= '';
+            this.email = '';
+            this.kind = '';
+            this.message = '';
+        }
+    }
+}
+</script>
 
 <style scoped>
 div, p, h2, ul, li {
@@ -158,182 +339,3 @@ div, p, h2, ul, li {
     opacity: 0;
 }
 </style>
-
-<script>
-import axios from 'axios'
-
-export default {
-    data: function() {
-        return {
-            name: '',
-            kana: '',
-            gender: '',
-            birth: '',
-            post: '',
-            adress: '',
-            tell: '',
-            email: '',
-            kind: '',
-            message: '',
-            result: '',
-        }
-    },
-    computed: {
-        checkName: function(){
-            if(!this.name){
-                return 'お名前を入力してください';
-            }
-            return '';
-        },
-        checkKana: function(){
-            if(!this.kana){
-                return 'フリガナを入力してください';
-            } else if(!this.validKatakana(this.kana)){
-                return 'フリガナをカタカナで入力してください';
-            }
-            return '';
-        },
-        checkGender: function(){
-            if(!this.gender){
-                return '性別を選択してください';
-            }
-            return '';
-        },
-        checkBirth: function(){
-            if(!this.birth){
-                return '生年月日を選択してください';
-            } else if(!this.validBirth(this.birth)){
-                return '生年月日を選択してください';
-            }
-            return '';
-        },
-        checkPost: function(){
-            if(!this.post){
-                return '郵便番号を入力してください';
-            } else if(!this.validPost(this.post)){
-                return '郵便番号をハイフンを入れずに入力してください';
-            }
-            return '';
-        },
-        checkAdress: function(){
-            if(!this.adress){
-                return '住所を入力してください';
-            }
-            return '';
-        },
-        checkTell: function(){
-            if(!this.tell){
-                return '電話番号を入れずに入力してください';
-            } else if(!this.validTell(this.tell)){
-                return '電話番号をハイフンを入れずに入力してください';
-            }
-            return '';
-        },
-        checkEmail: function(){
-            if(!this.email){
-                return 'メールアドレスを入力してください';
-            } else if(!this.validEmail(this.email)){
-                return 'メールアドレスを正しく入力してください';
-            }
-            return '';
-        },
-        checkKind: function(){
-            if(!this.kind){
-                return '問い合わせ種類を選択してください';
-            }
-            return '';
-        },
-        checkMessage: function(){
-            if(!this.message){
-                return '相談内容を入力してください';
-            }
-            return '';
-        },
-        errors: function() {
-            const errors = {
-                'name': this.checkName,
-                'kana': this.checkKana,
-                'gender': this.checkGender,
-                'birth': this.checkBirth,
-                'post': this.checkPost,
-                'adress': this.checkAdress,
-                'tell': this.checkTell,
-                'email': this.checkEmail,
-                'kind': this.checkKind,
-                'message': this.checkMessage,
-            };
-            for (var key in errors) {
-                if (errors[key] === '' || errors[key] === null || errors[key] === undefined) {
-                    delete errors[key];
-                }
-            }
-            return errors;
-        },
-        valid: function() {
-            return !Object.keys(this.errors).length;
-        }
-    },
-    methods: {
-        submit: async function(){
-            const result = await this.send();
-            this.result = result;
-            if(result === '送信完了'){
-                this.clear();
-            }
-        },
-        send: async function(){
-            const url = 'http://localhost/api/contact/send.php';
-            const params = {
-                'name': this.name,
-                'kana': this.kana,
-                'gender': this.gender,
-                'birth': this.birth,
-                'post': this.post,
-                'adress': this.adress,
-                'tell': this.tell,
-                'email': this.email,
-                'kind': this.kind,
-                'message': this.message
-            }
-            return await axios
-                .post(url, params)
-                .then(function(res){
-                    return res.data;
-                })
-                .catch(function(error){
-                    console.log(error);
-            });
-        },
-        validKatakana: function(kana) {
-            const re = /^[ァ-ンｧ-ﾝ\x20\u3000ﾞﾟ]*$/;
-            return re.test(kana);
-        },
-        validBirth: function(birth) {
-            const re = /^([0-9]{8})$/;
-            return re.test(birth);
-        },
-        validPost: function(post) {
-            const re = /^([0-9]{8})$/;
-            return re.test(post);
-        },
-        validTell: function(tell) {
-            const re = /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/;
-            return re.test(tell);
-        },
-        validEmail: function(email) {
-            const re = /^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
-            return re.test(email);
-        },
-        clear: function(){
-            this.name = '';
-            this.kana = '';
-            this.birth = '';
-            this.post = '';
-            this.adress = '';
-            this.tell= '';
-            this.email = '';
-            this.message = '';
-        }
-    }
-}
-</script>

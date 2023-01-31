@@ -7,7 +7,7 @@
                     <tr>
                         <th>氏名</th>
                         <td>
-                            <input v-model="name" placeholder="田中 太郎">
+                            <input v-model="name" maxlength="50" placeholder="田中 太郎">
                             <p class="error">{{ errors.name }}</p>
                         </td>
                     </tr>
@@ -48,7 +48,7 @@
                     <tr>
                         <th>住所</th>
                         <td>
-                            <input v-model="adress" placeholder="〇〇県〇〇市△△町1-1-1 〇〇コーポ101">
+                            <input v-model="adress" maxlength="200" placeholder="〇〇県〇〇市△△町1-1-1 〇〇コーポ101">
                             <p class="error">{{ errors.adress }}</p>
                         </td>
                     </tr>
@@ -61,7 +61,7 @@
                     <tr>
                         <th>メールアドレス</th>
                         <td>
-                            <input v-model="email" placeholder="info@example.co.jp">
+                            <input v-model="email" maxlength="200" placeholder="info@example.co.jp">
                             <p class="error">{{ errors.email }}</p>
                         </td>
                     </tr>
@@ -83,7 +83,7 @@
                     <tr>
                         <th>相談内容</th>
                         <td>
-                            <input v-model="message">
+                            <input v-model="message" maxlength="1000">
                             <p class="error">{{ errors.message }}</p>
                         </td>
                     </tr>

@@ -120,7 +120,7 @@ export default {
     computed: {
         checkName: function(){
             if(!this.name){
-                return 'お名前を入力してください';
+                return '氏名を入力してください';
             }
             return '';
         },
@@ -140,9 +140,9 @@ export default {
         },
         checkBirth: function(){
             if(!this.birth){
-                return '生年月日を選択してください';
+                return '生年月日を入力してください';
             } else if(!this.validBirth(this.birth)){
-                return '生年月日を選択してください';
+                return '生年月日を半角数字8桁で入力してください';
             }
             return '';
         },
@@ -150,7 +150,7 @@ export default {
             if(!this.post){
                 return '郵便番号を入力してください';
             } else if(!this.validPost(this.post)){
-                return '郵便番号を正しく入力してください';
+                return '郵便番号を半角数字7桁で入力してください';
             }
             return '';
         },

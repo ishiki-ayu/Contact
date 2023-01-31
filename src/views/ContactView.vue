@@ -22,10 +22,11 @@
                         <th>性別</th>
                         <td>
                           <p calss="select">
-                            <select v-model="selection.gender">
-                            <option>男性</option>
-                            <option>女性</option>
-                            <option>無回答</option>
+                            <select v-model="gender">
+                            <option value="3">-</option>
+                            <option value="0">男性</option>
+                            <option value="1">女性</option>
+                            <option value="2">無回答</option>
                           </select>
                             <p class="error">{{ errors.gender }}</p>
                         </td>
@@ -68,12 +69,13 @@
                         <th>問い合わせの種類</th>
                         <td>
                           <p calss="select">
-                            <select v-model="selection.kind">
-                            <option>ご質問</option>
-                            <option>ご意見ご要望</option>
-                            <option>資料請求</option>
-                            <option>ご依頼</option>
-                            <option>その他</option>
+                            <select v-model="kind">
+                            <option value="5">-</option>
+                            <option value="0">ご質問</option>
+                            <option value="1">ご意見ご要望</option>
+                            <option value="2">資料請求</option>
+                            <option value="3">ご依頼</option>
+                            <option value="4">その他</option>
                           </select>
                             <p class="error">{{ errors.kind }}</p>
                         </td>
@@ -111,10 +113,8 @@ export default {
             email: '',
             message: '',
             result: '',
-            selection: {
-                gender: [],
-                kind: []
-            }
+            gender: '3',
+            kind: '5'
         }
     },
     computed: {
@@ -133,7 +133,7 @@ export default {
             return '';
         },
         checkGender: function(){
-            if(!this.gender){
+            if(this.gender === '3'){
                 return '性別を選択してください';
             }
             return '';
@@ -169,7 +169,7 @@ export default {
             return '';
         },
         checkKind: function(){
-            if(!this.kind){
+            if(this.kind === '5'){
                 return '問い合わせ種類を選択してください';
             } 
             return '';

@@ -121,6 +121,8 @@ export default {
         checkName: function(){
             if(!this.name){
                 return '氏名を入力してください';
+            } else if(!this.validName(this.name)){
+                return '氏名を50字以内で入力してください';
             }
             return '';
         },
@@ -157,6 +159,8 @@ export default {
         checkAdress: function(){
             if(!this.adress){
                 return '住所を入力してください';
+            } else if(!this.validAdress(this.adress)){
+                return '住所を200字以内で入力してください';
             }
             return '';
         },
@@ -164,7 +168,7 @@ export default {
             if(!this.email){
                 return '';
             } else if(!this.validEmail(this.email)){
-                return 'メールアドレスを正しく入力してください';
+                return 'メールアドレスを200字以内で正しく入力してください';
             }
             return '';
         },
@@ -177,6 +181,8 @@ export default {
         checkMessage: function(){
             if(!this.message){
                 return '相談内容を入力してください';
+            } else if(!this.validMessage(this.message)){
+                return '相談内容を1000字以内で入力してください';
             }
             return '';
         },
